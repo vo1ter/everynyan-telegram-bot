@@ -19,7 +19,7 @@
     ```
 4. Create .env file:
     ```env
-        TELEGRAM_TOKEN=your_token
+    TELEGRAM_TOKEN=your_token
     ```
 5. Rename members.json.example to members.json.
 6. Launch your bot with pm2:
@@ -27,10 +27,3 @@
     pm2 start bot.js
     ```
 6. Done!
-
-## ToDo
-- [ ] Create tempmute
-- [ ] Create logs on threadCreate, threadDelete, threadListSync, threadMembersUpdate, threadMemberUpdate, threadUpdate, guildMemberUpdate, /mod kick, ban, mute and tempmute
-- [x] Change welcome channel id to system channel
-- [x] Transfer start role id into config.json
-- [ ] ~~Create reaction collector for game and rank roles~~ Irrelevant due to "insight" feature added recently to discord community servers.
