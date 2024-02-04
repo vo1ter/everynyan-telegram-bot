@@ -24,6 +24,6 @@
 5. Rename members.json.example to members.json.
 6. Launch your bot with pm2:
     ```bash
-    pm2 start bot.js
+    pm2 start boy.js --name Everynyan Bot
     ```
 6. Done!
