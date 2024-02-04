@@ -36,7 +36,22 @@ function removeUser(groupId, userId) { // remove user from database (e.g. if the
     fs.writeFileSync("./members.json", JSON.stringify(jsonData)) // update database
 }
 
-async function mentionEveryone(ctx, message, groupId) {
+async function mentionEveryone(ctx) {
+    const groupId = ctx.update.message.chat.id;
+    if(ctx.update.message.chat.id > 0) return;
+    let message = ""; // what to display with ping
+
+    try { // try catch so bot don't crash if message was deleted before he did it
+        ctx.deleteMessage(ctx.update.message.id);
+    }
+    catch (error) {}
+
+    if(ctx.update.message.text.split(" ").length > 1) { // if there are anything after @everyone, add it to the message
+        for(var i = 1; i < ctx.update.message.text.split(" ").length; i++) {
+            message += ctx.update.message.text.split(" ")[i] + " ";
+        }
+    }
+
     let memberListFile = fs.readFileSync("./members.json"); // read database
     let idList = JSON.parse(memberListFile)[`channel${groupId}`].ids; // get id's of the channel
     message += "\n" // add space to the message (so it won't look like garbage)
@@ -53,16 +68,23 @@ async function mentionEveryone(ctx, message, groupId) {
         message += `[${chatMemberUsername}](tg://user?id=${idList[i]}) `; // message constructor
     }
 
+    message += `\nPing author: [${ctx.update.message.from.username}](tg://user?id=${ctx.update.message.from.id})` // add ping author (just in case)
+
     ctx.sendMessage(message, { parse_mode: 'MarkdownV2' });
 }
 
-bot.hears('@everyone', (ctx) => {
-    try { // try catch so bot don't crash if message was deleted before he did it
-        ctx.deleteMessage(ctx.update.message.id);
-    }
-    catch (error) {}
-    mentionEveryone(ctx, "", ctx.update.message.chat.id)
-})
+bot.command('all', async (ctx) => { 
+    mentionEveryone(ctx)
+});
+
+bot.command('everyone', async (ctx) => {
+    mentionEveryone(ctx)
+});
+
+
+bot.hears(/@everyone(?:\s\d+|\s\w+|\s.+)?$/, (ctx) => {
+    mentionEveryone(ctx)
+});
 
 bot.on('message', (ctx) => {
     let userId = ctx.update.message.from.id;
@@ -83,15 +105,7 @@ bot.on('message', (ctx) => {
     }
 
     checkUser(channelId, userId)
-})
-
-bot.command('all', async (ctx) => {
-    console.log(ctx)
-})
-
-bot.command('everyone', async (ctx) => {
-    console.log(ctx)
-})
+});
 
 bot.launch()
 
