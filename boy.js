@@ -6,6 +6,10 @@ require('dotenv').config() // make them .env vars work
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN)
 
+function checkForForbiddenEntities(message) {
+    return message.replace(/[\!\.\<\>\(\)\#\&\|\{\}\[\]]/g, '\\$&'); // replace any forbidden entites (!.<>()#&|{}[]) so the will have \\ at the start
+}
+
 function checkUser(groupId, userId) { // check if user exists in database
     let memberListFile = fs.readFileSync("./members.json"); // read database
     let memberList = JSON.parse(memberListFile)[`channel${groupId}`]; // get data about the current channel
@@ -54,6 +58,7 @@ async function mentionEveryone(ctx) {
 
     let memberListFile = fs.readFileSync("./members.json"); // read database
     let idList = JSON.parse(memberListFile)[`channel${groupId}`].ids; // get id's of the channel
+    message = checkForForbiddenEntities(message)
     message += "\n" // add space to the message (so it won't look like garbage)
 
     for(let i = 0; idList.length > i; i++) {
