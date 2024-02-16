@@ -31,10 +31,10 @@ function checkUser(groupId, userId) { // check if user exists in database
     }
 }
 
-function removeUser(groupId, userId) { // remove user from database (e.g. if they left the group)
+async function removeUser(groupId, userId) { // remove user from database (e.g. if they left the group)
     let memberListFile = fs.readFileSync("./members.json"); // read database
     let jsonData = JSON.parse(memberListFile); // get all data from database
-    jsonData[`channel${groupId}`].ids = jsonData[`channel${groupId}`].ids.filter((element) => { // spooky searching algo
+    jsonData[`channel${groupId}`].ids = await jsonData[`channel${groupId}`].ids.filter((element) => { // spooky searching algo
         return element != userId // return results without the users id
     })
     fs.writeFileSync("./members.json", JSON.stringify(jsonData)) // update database
@@ -86,7 +86,6 @@ bot.command('everyone', async (ctx) => {
     mentionEveryone(ctx)
 });
 
-
 bot.hears(/@everyone(?:\s\d+|\s\w+|\s.+)?$/, (ctx) => {
     mentionEveryone(ctx)
 });
@@ -101,13 +100,6 @@ bot.on('message', (ctx) => {
         }
     }
     catch {}
-
-    if(ctx.update.message.from.username == "uasaverbot" && !ctx.update.message.video) { // delete ad messages from USaver
-        try {
-            ctx.deleteMessage(ctx.update.message.id)
-        }
-        catch (err) {}
-    }
 
     checkUser(channelId, userId)
 });
